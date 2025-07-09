@@ -18,11 +18,11 @@ CREATE TABLE payments (
 );
 
 INSERT INTO companies VALUES
-  ('com1', 'Company A'),
-  ('com2', 'Company B'),
-  ('com3', 'Company C');
+  ('com001', 'Company A'),
+  ('com002', 'Company B'),
+  ('com003', 'Company C');
 
 INSERT INTO payments (company_id, employee_id, bank_bsb, bank_account, amount_cents, currency, pay_date) VALUES
-  ('abc123', 'emp001', '062000', '12345678', 250000, 'AUD', '2025-07-09'),
-  ('abc123', 'emp002', '082003', '98765432', 300000, 'AUD', '2025-07-09'),
-  ('xyz789', 'emp101', '032000', '45612378', 150000, 'AUD', '2025-07-10');
+  ('com001', 'emp001', '062000', '12345678', 250000, 'AUD', '2025-07-09'),
+  ('com002', 'emp002', '082003', '98765432', 300000, 'AUD', '2025-07-09'),
+  ('com003', 'emp003', '032000', '45612378', 150000, 'AUD', '2025-07-10');
