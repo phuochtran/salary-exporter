@@ -35,13 +35,12 @@
 ├── salary-payment.drawio.png
 ├── services
 │   └── payments_service.rb
-├── spec
-│   ├── payments_spec.rb
-│   ├── spec_formatter.rb
-│   └── spec_helper.rb
-└── structure.txt
+└── spec
+    ├── payments_spec.rb
+    ├── spec_formatter.rb
+    └── spec_helper.rb
 
-8 directories, 17 files
+8 directories, 16 files
 ```
 
 ## Technologies
