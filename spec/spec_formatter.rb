@@ -19,12 +19,12 @@ class SpecFormatter < RSpec::Core::Formatters::BaseTextFormatter
 
   def example_passed(notification)
     @test_number += 1
-    output.puts "Test case ##{@test_number}: #{color('PASSED', 32)} - #{notification.example.full_description}"
+    output.puts "Test case #{@test_number}: #{color('PASSED', 32)} - #{notification.example.full_description}"
   end
 
   def example_failed(notification)
     @test_number += 1
-    output.puts "Test case ##{@test_number}: #{color('FAILED', 31)} - #{notification.example.full_description}"
+    output.puts "Test case #{@test_number}: #{color('FAILED', 31)} - #{notification.example.full_description}"
     output.puts "#{notification.exception.message}"
   end
 
