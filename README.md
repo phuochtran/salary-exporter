@@ -72,6 +72,7 @@ bundle exec rspec
 
 ## Running
 
+Execute below command to run the service on local machine
 ```bash
 bundle exec rackup
 ```
@@ -94,7 +95,7 @@ end
 
 ## API Endpoint
 
-This below is a sample request:
+This below is a sample request of API endpoint *POST /payments*:
 ```bash
 curl --location 'http://localhost:9292/payments' \
 --header 'Content-Type: application/json' \
