@@ -62,7 +62,6 @@ RSpec.describe 'POST /payments' do
   end
 
   # Test case 5
-  it 'returns 400 when account number is invalid' do
   it 'returns 400 when currency is invalid' do
     invalid_payload = valid_payload.dup
     invalid_payload[:payments][0][:currency] = 'USD'
