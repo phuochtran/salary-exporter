@@ -9,8 +9,8 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - pgdata:/var/lib/postgressql/data
-      - ./resource:/docker-entrypoint-initdb.d
+      - pgdata:/var/lib/postgressql/data # mount data volume
+      - ./resource:/docker-entrypoint-initdb.d # mount entry folder
 
 volumes:
   pgdata:

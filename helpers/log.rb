@@ -1,5 +1,6 @@
 require 'logger'
 
+# Set up logging
 if ENV['RACK_ENV'] == 'test'
   LOG = Logger.new(IO::NULL)
 else

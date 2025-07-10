@@ -1,7 +1,7 @@
 require 'pg'
 require 'dotenv/load' # Loads .env file into ENV
 
-# Create a database connection to PostgreSQL using ENV variables
+# Create a database connection to PostgreSQL
 def connect_database
   PG.connect(
     host: ENV['DB_HOST'],

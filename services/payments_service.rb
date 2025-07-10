@@ -7,8 +7,14 @@ module PaymentsService
   def self.export
     begin
       LOG.info "Exporting salary payments ..."
+
+      # Get DB connection
       db = connect_database
+
+      # Collect all payments need to be exported
       payments = db.exec_params("SELECT * FROM payments WHERE status = 'pending' AND pay_date <= $1", [Time.now])
+
+      # Do nothing if there is no payments need to be exported
       return LOG.info "No payments to export" if payments.ntuples == 0
 
       timestamp = Time.now.strftime("%Y_%m_%d")

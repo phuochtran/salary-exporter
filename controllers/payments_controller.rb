@@ -6,22 +6,28 @@ require_relative '../helpers/log'
 
 module PaymentsController
   def self.create(req)
+    # Extract request data
     data = JSON.parse(req.body.read)
     company_id = data['company_id']
     payments = data['payments']
 
+    # Basic validation
     return response(400, 'Missing company_id') unless company_id
     return response(400, 'Missing payments') unless payments.is_a?(Array)
 
+    # Get DB connection
     db = connect_database
 
+    # Process every payments of the request
     payments.each do |p|
+      # Validate each payment as requirement
       valid, error_message = validate(p)
       return response(400, error_message) unless valid
 
+      # Save the payment into DB
       db.exec_params(
-        'INSERT INTO payments (company_id, employee_id, bank_bsb, bank_account, amount_cents, currency, pay_date) VALUES ($1, $2, $3, $4, $5, $6, $7)',
-        [company_id, p['employee_id'], p['bank_bsb'], p['bank_account'], p['amount_cents'], p['currency'], p['pay_date']]
+        'INSERT INTO payments (company_id, employee_id, bank_bsb, bank_account, amount_cents, currency, pay_date, status) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)',
+        [company_id, p['employee_id'], p['bank_bsb'], p['bank_account'], p['amount_cents'], p['currency'], p['pay_date'], 'pending']
       )
     end
     response(201, 'Successfully created payments')
