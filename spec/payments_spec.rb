@@ -29,7 +29,7 @@ RSpec.describe 'POST /payments' do
   it 'returns 201 when valid' do
     post '/payments', valid_payload.to_json, 'Content-Type' => 'application/json'
     expect(last_response.status).to eq(201)
-    expect(JSON.parse(last_response.body)['status']).to eq('success')
+    expect(JSON.parse(last_response.body)['status']).to eq('SUCCESS')
   end
 
   it 'returns 400 when amount is invalid' do
@@ -37,7 +37,7 @@ RSpec.describe 'POST /payments' do
     invalid_payload[:payments][0][:amount_cents] = 0
     post '/payments', invalid_payload.to_json, 'Content-Type' => 'application/json'
     expect(last_response.status).to eq(400)
-    expect(JSON.parse(last_response.body)['status']).to eq('error')
+    expect(JSON.parse(last_response.body)['status']).to eq('ERROR')
   end
 
   it 'returns 400 when bsb is invalid' do
@@ -45,7 +45,7 @@ RSpec.describe 'POST /payments' do
     invalid_payload[:payments][0][:bank_bsb] = '06200'
     post '/payments', invalid_payload.to_json, 'Content-Type' => 'application/json'
     expect(last_response.status).to eq(400)
-    expect(JSON.parse(last_response.body)['status']).to eq('error')
+    expect(JSON.parse(last_response.body)['status']).to eq('ERROR')
   end
 
   it 'returns 400 when account number is invalid' do
@@ -53,7 +53,7 @@ RSpec.describe 'POST /payments' do
     invalid_payload[:payments][0][:bank_account] = '12345'
     post '/payments', invalid_payload.to_json, 'Content-Type' => 'application/json'
     expect(last_response.status).to eq(400)
-    expect(JSON.parse(last_response.body)['status']).to eq('error')
+    expect(JSON.parse(last_response.body)['status']).to eq('ERROR')
   end
 
   it 'returns 400 when currency is invalid' do
@@ -61,7 +61,7 @@ RSpec.describe 'POST /payments' do
     invalid_payload[:payments][0][:currency] = 'USD'
     post '/payments', invalid_payload.to_json, 'Content-Type' => 'application/json'
     expect(last_response.status).to eq(400)
-    expect(JSON.parse(last_response.body)['status']).to eq('error')
+    expect(JSON.parse(last_response.body)['status']).to eq('ERROR')
   end
 
   it 'returns 400 when pay date is invalid' do
@@ -69,6 +69,6 @@ RSpec.describe 'POST /payments' do
     invalid_payload[:payments][0][:pay_date] = (Date.today - 1).to_s
     post '/payments', invalid_payload.to_json, 'Content-Type' => 'application/json'
     expect(last_response.status).to eq(400)
-    expect(JSON.parse(last_response.body)['status']).to eq('error')
+    expect(JSON.parse(last_response.body)['status']).to eq('ERROR')
   end
 end
