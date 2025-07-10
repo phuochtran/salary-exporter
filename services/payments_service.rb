@@ -6,7 +6,7 @@ require_relative '../helpers/log'
 module PaymentsService
   def self.export
     begin
-      LOG.info "Starting export salary payments ..."
+      LOG.info "Exporting salary payments ..."
       db = connect_database
       payments = db.exec_params("SELECT * FROM payments WHERE status = 'pending' AND pay_date <= $1", [Time.now])
       return LOG.info "No payments to export" if payments.ntuples == 0

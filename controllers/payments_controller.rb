@@ -2,6 +2,7 @@ require 'rack'
 require 'json'
 require 'date'
 require_relative '../helpers/database'
+require_relative '../helpers/log'
 
 module PaymentsController
   def self.create(req)
@@ -23,7 +24,7 @@ module PaymentsController
         [company_id, p['employee_id'], p['bank_bsb'], p['bank_account'], p['amount_cents'], p['currency'], p['pay_date']]
       )
     end
-    response(201, 'Payments have been created successfully')
+    response(201, 'Successfully created payments')
   rescue => e
     response(500, e.message)
   end
@@ -39,11 +40,16 @@ module PaymentsController
 
   def self.response(status_code, message)
     body = {
-      status: status_code.to_i >= 200 && status_code.to_i < 300 ? 'success' : 'error',
+      status: status_code.to_i >= 200 && status_code.to_i < 300 ? 'SUCCESS' : 'ERROR',
       details: {
         message: message
       }
     }
+    if body[:status] == 'SUCCESS'
+      LOG.info message
+    else
+      LOG.error message
+    end
     [status_code, { 'content-type' => 'application/json' }, [body.to_json]]
   end
 end
