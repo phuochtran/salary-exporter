@@ -95,7 +95,7 @@ end
 ## API Endpoint
 
 This below is a sample request:
-```http
+```bash
 curl --location 'http://localhost:9292/payments' \
 --header 'Content-Type: application/json' \
 --data '{
