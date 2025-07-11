@@ -6,6 +6,7 @@ run App.new
 
 # Configure cronjob scheduling
 scheduler = Rufus::Scheduler.new
-scheduler.cron '0 17 * * *' do
+export_time = ENV['EXPORT_TIME']
+scheduler.cron export_time do
   PaymentsService.export
 end

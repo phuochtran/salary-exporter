@@ -5,8 +5,8 @@ require_relative '../helpers/log'
 
 module PaymentsService
   def self.export
-    exports_dir = 'exports'
-    FileUtils.mkdir_p(exports_dir)
+    export_dir = ENV['EXPORT_DIR']
+    FileUtils.mkdir_p(export_dir)
     begin
       LOG.info "Exporting salary payments ..."
 
@@ -21,7 +21,7 @@ module PaymentsService
 
       timestamp = Time.now.strftime("%Y_%m_%d")
       exported_file = "#{timestamp}.txt"
-      exported_file_path = File.expand_path(File.join(exports_dir, exported_file))
+      exported_file_path = File.expand_path(File.join(export_dir, exported_file))
 
       File.open(exported_file_path, 'w') do |file|
         pending_payments.each do |payment|
@@ -39,15 +39,15 @@ module PaymentsService
   end
 
   def self.upload(exported_file_path)
-    outbox_dir = 'outbox'
-    FileUtils.mkdir_p(outbox_dir)
+    upload_dir = ENV['UPLOAD_DIR']
+    FileUtils.mkdir_p(upload_dir)
     begin
-      exported_file = File.basename(exported_file_path)
-      outbox_file_path = File.expand_path(File.join(outbox_dir, exported_file))
-      FileUtils.cp(exported_file_path, outbox_file_path)
-      LOG.info "Successfully uploaded file #{exported_file} to bank via SFTP"
+      uploaded_file = File.basename(exported_file_path)
+      uploaded_file_path = File.expand_path(File.join(upload_dir, uploaded_file))
+      FileUtils.cp(exported_file_path, uploaded_file_path)
+      LOG.info "Successfully uploaded file #{uploaded_file} to bank via SFTP"
     rescue => e
-      LOG.error "Failed to upload file #{exported_file} to bank via SFTP"
+      LOG.error "Failed to upload file #{uploaded_file} to bank via SFTP"
       LOG.debug e.backtrace.join("\n")
     end
   end
