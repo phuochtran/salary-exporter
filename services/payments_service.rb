@@ -8,12 +8,10 @@ module PaymentsService
     export_dir = ENV['EXPORT_DIR']
     FileUtils.mkdir_p(export_dir)
     begin
-      LOG.info "Exporting salary payments ..."
-
-      # Get DB connection
+      LOG.info "Exporting salary payments"
       db = connect_database
 
-      # Collect all payments need to be exported
+      # Collect all pending payments need to be exported
       pending_payments = db.exec_params("SELECT * FROM payments WHERE status = 'pending' AND pay_date <= $1", [Time.now])
 
       # Do nothing if there is no payments need to be exported
@@ -43,10 +41,24 @@ module PaymentsService
     begin
       file_name = File.basename(exported_file)
       uploaded_file = File.expand_path(File.join(upload_dir, file_name))
-      FileUtils.cp(exported_file, uploaded_file)
-      LOG.info "Successfully uploaded file #{file_name} to bank via SFTP"
+      LOG.info "Uploading file #{file_name} to bank"
+      # Retry logic when uploading file to bank via SFTP
+      retry_attempts = 0
+      max_retry_attempts = 3
+      begin
+        raise "ERRORRRRRRRRRR"
+        FileUtils.cp(exported_file, uploaded_file)
+      rescue => e
+        retry_attempts += 1
+        if retry_attempts <= max_retry_attempts
+          LOG.warn "Retrying upload file #{file_name} to bank [#{retry_attempts}/#{max_retry_attempts} attempts]"
+          retry
+        end
+        raise e
+      end
+      LOG.info "Successfully uploaded file #{file_name} to bank"
     rescue => e
-      LOG.error "Failed to upload file #{file_name} to bank via SFTP"
+      LOG.error "Failed to upload file #{file_name} to bank: #{e.class} - #{e.message}"
       LOG.debug e.backtrace.join("\n")
     end
   end
