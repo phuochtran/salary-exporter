@@ -5,6 +5,8 @@ require_relative '../helpers/log'
 
 module PaymentsService
   def self.export
+    export = 'export'
+    FileUtils.mkdir_p(export)
     begin
       LOG.info "Exporting salary payments ..."
 
@@ -18,8 +20,8 @@ module PaymentsService
       return LOG.info "No payments to export" if payments.ntuples == 0
 
       timestamp = Time.now.strftime("%Y_%m_%d")
-      file_name = "#{timestamp}.txt"
-      export_path = File.expand_path(File.join("export", file_name))
+      file = "#{timestamp}.txt"
+      export_path = File.expand_path(File.join(export, file))
 
       File.open(export_path, 'w') do |file|
         payments.each do |p|
@@ -29,16 +31,18 @@ module PaymentsService
         end
       end
       LOG.info "Successfully exported #{payments.ntuples} payments to file #{export_path}"
-      upload(export_path, file_name)
+      upload(export_path, file)
     rescue => e
       LOG.error "Failed to export payments: #{e.class} - #{e.message}"
       LOG.debug e.backtrace.join("\n")
     end
   end
 
-  def self.upload(export_path, file_name)
+  def self.upload(export_path, file)
+    outbox = 'outbox'
+    FileUtils.mkdir_p(outbox)
     begin
-      outbox_path = File.expand_path(File.join("outbox", file_name))
+      outbox_path = File.expand_path(File.join(outbox, file))
       FileUtils.mv(export_path, outbox_path)
       LOG.info "Successfully uploaded file #{export_path} to bank via SFTP"
     rescue => e
