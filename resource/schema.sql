@@ -16,7 +16,7 @@ CREATE TABLE payments (
   pay_date DATE,
   status TEXT DEFAULT 'pending',
   exported_at TIMESTAMP,
-  export_file TEXT,
+  exported_file TEXT,
   FOREIGN KEY (company_id) REFERENCES companies(company_id)
 );
 

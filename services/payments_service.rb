@@ -5,8 +5,8 @@ require_relative '../helpers/log'
 
 module PaymentsService
   def self.export
-    export = 'export'
-    FileUtils.mkdir_p(export)
+    exports_dir = 'exports'
+    FileUtils.mkdir_p(exports_dir)
     begin
       LOG.info "Exporting salary payments ..."
 
@@ -14,39 +14,40 @@ module PaymentsService
       db = connect_database
 
       # Collect all payments need to be exported
-      payments = db.exec_params("SELECT * FROM payments WHERE status = 'pending' AND pay_date <= $1", [Time.now])
+      pending_payments = db.exec_params("SELECT * FROM payments WHERE status = 'pending' AND pay_date <= $1", [Time.now])
 
       # Do nothing if there is no payments need to be exported
-      return LOG.info "No payments to export" if payments.ntuples == 0
+      return LOG.info "No payments to export" if pending_payments.ntuples == 0
 
       timestamp = Time.now.strftime("%Y_%m_%d")
-      file = "#{timestamp}.txt"
-      export_path = File.expand_path(File.join(export, file))
+      exported_file = "#{timestamp}.txt"
+      exported_file_path = File.expand_path(File.join(exports_dir, exported_file))
 
-      File.open(export_path, 'w') do |file|
-        payments.each do |p|
-          line = [p['company_id'], p['employee_id'], p['bank_bsb'], p['bank_account'], p['amount_cents'], p['currency'], p['pay_date']].join(',')
+      File.open(exported_file_path, 'w') do |file|
+        pending_payments.each do |payment|
+          line = [payment['company_id'], payment['employee_id'], payment['bank_bsb'], payment['bank_account'], payment['amount_cents'], payment['currency'], payment['pay_date']].join(',')
           file.puts(line)
-          db.exec_params("UPDATE payments SET status = 'exported', exported_at = $1, export_file = $2 WHERE payment_id = $3", [Time.now, export_path, p['payment_id']])
+          db.exec_params("UPDATE payments SET status = 'exported', exported_at = $1, exported_file = $2 WHERE payment_id = $3", [Time.now, exported_file_path, payment['payment_id']])
         end
       end
-      LOG.info "Successfully exported #{payments.ntuples} payments to file #{export_path}"
-      upload(export_path, file)
+      LOG.info "Successfully exported #{pending_payments.ntuples} payments to file #{exported_file}"
+      upload(exported_file_path)
     rescue => e
       LOG.error "Failed to export payments: #{e.class} - #{e.message}"
       LOG.debug e.backtrace.join("\n")
     end
   end
 
-  def self.upload(export_path, file)
-    outbox = 'outbox'
-    FileUtils.mkdir_p(outbox)
+  def self.upload(exported_file_path)
+    outbox_dir = 'outbox'
+    FileUtils.mkdir_p(outbox_dir)
     begin
-      outbox_path = File.expand_path(File.join(outbox, file))
-      FileUtils.mv(export_path, outbox_path)
-      LOG.info "Successfully uploaded file #{export_path} to bank via SFTP"
+      exported_file = File.basename(exported_file_path)
+      outbox_file_path = File.expand_path(File.join(outbox_dir, exported_file))
+      FileUtils.cp(exported_file_path, outbox_file_path)
+      LOG.info "Successfully uploaded file #{exported_file} to bank via SFTP"
     rescue => e
-      LOG.error "Failed to upload file #{export_path} to bank via SFTP"
+      LOG.error "Failed to upload file #{exported_file} to bank via SFTP"
       LOG.debug e.backtrace.join("\n")
     end
   end
