@@ -46,7 +46,6 @@ module PaymentsService
       retry_attempts = 0
       max_retry_attempts = 3
       begin
-        raise "ERRORRRRRRRRRR"
         FileUtils.cp(exported_file, uploaded_file)
       rescue => e
         retry_attempts += 1
