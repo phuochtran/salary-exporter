@@ -33,6 +33,7 @@ bundle exec rspec
 
 echo "[6/6] Cleaning up..."
 kill "$APP_PID"
+rm -rf log/
 docker-compose down
 
 echo "Done"
