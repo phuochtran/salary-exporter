@@ -2,8 +2,25 @@ require 'date'
 require 'fileutils'
 require_relative '../helpers/database'
 require_relative '../helpers/log'
+require_relative '../helpers/http'
 
 module PaymentsService
+  def self.create(company_id, payments)
+    # Get DB connection
+    db = connect_database
+
+    payment_count = 0
+    # Save each payment into DB
+    payments.each do |payment|
+      payment_count += 1
+      db.exec_params(
+        'INSERT INTO payments (company_id, employee_id, bank_bsb, bank_account, amount_cents, currency, pay_date, status) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)',
+        [company_id, payment['employee_id'], payment['bank_bsb'], payment['bank_account'], payment['amount_cents'], payment['currency'], payment['pay_date'], 'pending']
+      )
+    end
+    LOG.info "Successfully created #{payment_count} payments for company #{company_id}"
+  end
+
   def self.export
     export_dir = ENV['EXPORT_DIR']
     FileUtils.mkdir_p(export_dir)
@@ -42,6 +59,7 @@ module PaymentsService
       file_name = File.basename(exported_file)
       uploaded_file = File.expand_path(File.join(upload_dir, file_name))
       LOG.info "Uploading file #{file_name} to bank"
+
       # Retry logic when uploading file to bank via SFTP
       retry_attempts = 0
       max_retry_attempts = 3

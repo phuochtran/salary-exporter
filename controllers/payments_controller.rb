@@ -1,61 +1,20 @@
-require 'rack'
 require 'json'
-require 'date'
-require_relative '../helpers/database'
-require_relative '../helpers/log'
+require_relative '../services/payments_service'
+require_relative '../validators/payments_validator'
+require_relative '../error_handlers/payments_error_handler'
 
 module PaymentsController
-  def self.create(req)
+  def self.create(request)
     # Extract request data
-    data = JSON.parse(req.body.read)
-    company_id = data['company_id']
-    payments = data['payments']
+    data = JSON.parse(request.body.read)
 
-    # Basic validation
-    return response(400, 'Missing company_id') unless company_id
-    return response(400, 'Missing payments') unless payments.is_a?(Array)
+    # Validate request data
+    PaymentsValidator.validate(data['company_id'], data['payments'])
 
-    # Get DB connection
-    db = connect_database
-
-    # Process every payments of the request
-    payments.each do |p|
-      # Validate each payment as requirement
-      valid, error_message = validate(p)
-      return response(400, error_message) unless valid
-
-      # Save the payment into DB
-      db.exec_params(
-        'INSERT INTO payments (company_id, employee_id, bank_bsb, bank_account, amount_cents, currency, pay_date, status) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)',
-        [company_id, p['employee_id'], p['bank_bsb'], p['bank_account'], p['amount_cents'], p['currency'], p['pay_date'], 'pending']
-      )
-    end
-    response(201, 'Successfully created payments')
-  rescue => e
-    response(500, e.message)
-  end
-
-  def self.validate(p)
-    return [false, 'Amount must be > 0'] unless p['amount_cents'].to_i > 0
-    return [false, 'BSB must be 6 digits'] unless p['bank_bsb'] =~ /^\d{6}$/
-    return [false, 'Account number must be 6-9 digits'] unless p['bank_account'] =~ /^\d{6,9}$/
-    return [false, 'Currency must be AUD'] unless p['currency'] == 'AUD'
-    return [false, 'Pay date must be today or later'] if Date.parse(p['pay_date']) < Date.today
-    [true, '']
-  end
-
-  def self.response(status_code, message)
-    body = {
-      status: status_code.to_i >= 200 && status_code.to_i < 300 ? 'SUCCESS' : 'ERROR',
-      details: {
-        message: message
-      }
-    }
-    if body[:status] == 'SUCCESS'
-      LOG.info message
-    else
-      LOG.error message
-    end
-    [status_code, { 'content-type' => 'application/json' }, [body.to_json]]
+    # Create payments
+    PaymentsService.create(data['company_id'], data['payments'])
+    return Http.response(201, 'Successfully created payments')
+  rescue => error
+    PaymentsErrorHandler.handle(error)
   end
 end

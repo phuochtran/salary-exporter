@@ -1,13 +1,16 @@
+require 'rack'
 require_relative './controllers/payments_controller'
+require_relative './helpers/http'
 
 class App
   def call(env)
-    req = Rack::Request.new(env)
-    case [req.request_method, req.path_info]
+    request = Rack::Request.new(env)
+    LOG.info "Calling Salary Payment API: #{request.request_method} - #{request.path_info}"
+    case [request.request_method, request.path_info]
     when ['POST', '/payments']
-      PaymentsController.create(req)
+      return PaymentsController.create(request)
     else
-      PaymentsController.response(404, 'Not found')
+      return Http.response(404, 'API endpoint not found')
     end
   end
 end
