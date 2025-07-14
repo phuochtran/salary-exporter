@@ -1,6 +1,6 @@
 require 'rack'
 require_relative './controllers/payments_controller'
-require_relative './helpers/http'
+require_relative './utils/http'
 
 class App
   def call(env)

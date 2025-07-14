@@ -1,4 +1,4 @@
-require_relative '../lib/app'
+require_relative '../app'
 require 'rack/test'
 require 'rspec'
 require 'date'

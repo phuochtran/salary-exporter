@@ -1,6 +1,6 @@
 require 'date'
-require_relative '../helpers/http'
-require_relative '../error_handlers/custom_errors/validation_error'
+require_relative '../utils/http'
+require_relative '../errors/validation_error'
 
 module PaymentsValidator
   def self.validate(company_id, payments)

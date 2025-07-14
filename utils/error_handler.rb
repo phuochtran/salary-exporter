@@ -1,6 +1,6 @@
-require_relative 'custom_errors/validation_error'
+require_relative '../errors/validation_error'
 
-module PaymentsErrorHandler
+module ErrorHandler
   def self.handle(error)
     LOG.error "Failed to call Salary Payment API: #{error.class} - #{error.message}"
     LOG.debug error.backtrace.join("\n")

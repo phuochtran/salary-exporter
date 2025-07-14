@@ -1,6 +1,6 @@
 require 'rufus-scheduler'
-require './lib/app'
-require './lib/services/payments_service'
+require './app'
+require './services/payments_service'
 
 run App.new
 

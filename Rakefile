@@ -1,4 +1,4 @@
-require './lib/services/payments_service'
+require './services/payments_service'
 
 task :export do
   PaymentsService.export

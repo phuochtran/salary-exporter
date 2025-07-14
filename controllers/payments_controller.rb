@@ -1,7 +1,7 @@
 require 'json'
 require_relative '../services/payments_service'
 require_relative '../validators/payments_validator'
-require_relative '../error_handlers/payments_error_handler'
+require_relative '../utils/error_handler'
 
 module PaymentsController
   def self.create(request)
@@ -15,6 +15,6 @@ module PaymentsController
     PaymentsService.create(data['company_id'], data['payments'])
     return Http.response(201, 'Successfully created payments')
   rescue => error
-    PaymentsErrorHandler.handle(error)
+    ErrorHandler.handle(error)
   end
 end

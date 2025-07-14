@@ -1,8 +1,8 @@
 require 'date'
 require 'fileutils'
-require_relative '../helpers/database'
-require_relative '../helpers/log'
-require_relative '../helpers/http'
+require_relative '../utils/database'
+require_relative '../utils/log'
+require_relative '../utils/http'
 
 module PaymentsService
   def self.create(company_id, payments)
