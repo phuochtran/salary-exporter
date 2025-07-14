@@ -17,30 +17,38 @@
 ```txt
 .
 ├── app.rb
+├── bin
+│   ├── export
+│   ├── run
+│   └── test
 ├── config.ru
 ├── controllers
-│   └── payments_controller.rb
+│   └── payments_controller.rb
 ├── docker-compose.yml
-├── export
+├── errors
+│   └── validation_error.rb
 ├── Gemfile
 ├── Gemfile.lock
-├── helpers
-│   ├── database.rb
-│   └── log.rb
-├── outbox
 ├── Rakefile
 ├── README.md
 ├── resource
-│   └── schema.sql
+│   └── schema.sql
 ├── salary-payment.drawio.png
 ├── services
-│   └── payments_service.rb
-└── spec
-    ├── payments_spec.rb
-    ├── spec_formatter.rb
-    └── spec_helper.rb
+│   └── payments_service.rb
+├── spec
+│   ├── payments_spec.rb
+│   ├── spec_formatter.rb
+│   └── spec_helper.rb
+├── utils
+│   ├── database.rb
+│   ├── error_handler.rb
+│   ├── http.rb
+│   └── log.rb
+└── validators
+    └── payments_validator.rb
 
-8 directories, 16 files
+9 directories, 23 files
 ```
 
 ## Technologies
@@ -66,21 +74,21 @@ docker-compose up -d
 
 Execute below command to run all test cases
 ```bash
-bundle exec rspec
+./bin/test
 ```
 
 ## Running
 
 Execute below command to run the service on local machine
 ```bash
-bundle exec rackup
+./bin/run
 ```
 
 ## Export Utility
 
 #### 1. Export manually
 ```bash
-bundle exec rake export
+./bin/export
 ```
 
 #### 2. Daily export file at 5:00 PM
@@ -109,7 +117,7 @@ curl --location 'http://localhost:9292/payments' \
       "currency": "AUD",
       "pay_date": "2025-07-10"
     },
-        {
+    {
       "employee_id": "emp002",
       "bank_bsb": "062000",
       "bank_account": "12345678",
