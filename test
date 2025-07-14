@@ -1,0 +1,38 @@
+#!/bin/bash
+
+set -e
+
+PORT=9292
+RACKUP_LOG="log/test-server.log"
+DB_CONTAINER_NAME="postgres"
+DB_USER="admin"
+APP_PID=""
+
+echo "[1/6] Starting Docker containers..."
+docker-compose up -d
+
+echo "[2/6] Waiting for PostgreSQL container to be ready..."
+until docker exec "$DB_CONTAINER_NAME" pg_isready -U "$DB_USER"; do
+  sleep 1
+done
+echo "PostgreSQL is ready"
+
+echo "[3/6] Starting Rack app in background..."
+mkdir -p log
+bundle exec rackup > "$RACKUP_LOG" 2>&1 &
+APP_PID=$!
+
+echo "[4/6] Waiting for server to listen on port $PORT..."
+until nc -z localhost $PORT; do
+  sleep 0.5
+done
+echo "Server is up"
+
+echo "[5/6] Running test suite..."
+bundle exec rspec
+
+echo "[6/6] Cleaning up..."
+kill "$APP_PID"
+docker-compose down
+
+echo "Done"

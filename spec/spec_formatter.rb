@@ -14,7 +14,7 @@ class SpecFormatter < RSpec::Core::Formatters::BaseTextFormatter
 
   def start(notification)
     @test_number = 0
-    output.puts "\nStarting test suite ...\n\n"
+    output.puts "Starting test suite ...\n"
   end
 
   def example_passed(notification)

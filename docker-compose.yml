@@ -1,6 +1,7 @@
 services:
-  db:
+  postgres:
     image: postgres:17
+    container_name: postgres
     restart: always
     environment:
       POSTGRES_DB: salary_payment
