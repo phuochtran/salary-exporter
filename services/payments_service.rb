@@ -62,13 +62,13 @@ module PaymentsService
 
       # Retry logic when uploading file to bank via SFTP
       retry_attempts = 0
-      max_retry_attempts = 3
+      max_retry_attempts = ENV['MAX_RETRY_ATTEMPTS'].to_i
       begin
         FileUtils.cp(exported_file, uploaded_file)
       rescue => e
         retry_attempts += 1
         if retry_attempts <= max_retry_attempts
-          LOG.warn "Retrying upload file #{file_name} to bank [#{retry_attempts}/#{max_retry_attempts} attempts]"
+          LOG.warn "Retrying upload file #{file_name} to bank [#{retry_attempts}/#{max_retry_attempts}]"
           retry
         end
         raise e
